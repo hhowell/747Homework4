@@ -1,32 +1,104 @@
 MODULE main
-  VAR
-    traffic_light: {RED, YELLOW, GREEN};
-    ped_light: {WAIT, WALK, FLASH};
-    button: {RESET, SET};
-    traffic_sensor: {VACANT, WAITING};
-  ASSIGN
-    init(traffic_light) := RED;
-    next(traffic_light) := case
-                            traffic_light = RED & button = RESET: GREEN;
-                            traffic_light = RED: RED;
-                            traffic_light = GREEN & button = SET: {GREEN,YELLOW};
-                            traffic_light = GREEN: GREEN;
-                            traffic_light = YELLOW: {YELLOW, RED};
-                            TRUE: {RED};
-                           esac;
-    init(ped_light) := WAIT;
-    next(ped_light) := case
-                        ped_light = WAIT & traffic_light = RED: WALK;
-                        ped_light = WAIT: WAIT;
-                        ped_light = WALK: {WALK,FLASH};
-                        ped_light = WALK: {FLASH,WAIT};
-                        TRUE: {WAIT};
-                       esac;      
-    next(button) := case
-                     button = SET & ped_light = WALK: RESET;
-                     button = SET: SET;
-                     button = RESET & traffic_light = GREEN: {RESET,SET};
-                     button = RESET: RESET;
-                     TRUE: {RESET};
-                    esac;
+    VAR
+        traffic_light_NS: {RED, YELLOW, GREEN};
+        traffic_light_EW: {RED, YELLOW, GREEN};
+
+        ped_light_NS: {WAIT, WALK, FLASH};
+        ped_light_EW: {WAIT, WALK, FLASH};
+
+        button_NS: {RESET, SET};
+        button_EW: {RESET, SET};
+
+        traffic_sensor_NS: {EMPTY, WAITING};
+        traffic_sensor_EW: {EMPTY, WAITING};
+
+        emergency_sensor_NS: boolean; 
+        emergency_sensor_EW: boolean;
+
+    ASSIGN
+        init(traffic_light_NS) := RED;
+        init(traffic_light_EW) := RED;
+        init(ped_light_NS) := WAIT;
+        init(ped_light_EW) := WAIT;
+        init(traffic_sensor_NS) := EMPTY;
+        init(traffic_sensor_EW) := EMPTY;
+        init(emergency_sensor_NS) := FALSE;
+        init(emergency_sensor_EW) := FALSE;
+        
+        next(traffic_light_NS) := case
+            traffic_light_NS = RED & traffic_light_EW = RED & button_NS = RESET: GREEN;
+            traffic_light_NS = RED: RED;
+            traffic_light_NS = GREEN & traffic_light_EW = RED & button_NS = SET: {GREEN,YELLOW};
+            traffic_light_NS = GREEN: GREEN;
+            traffic_light_NS = YELLOW: {YELLOW, RED};
+            TRUE: {RED};
+        esac;
+    
+        next(traffic_light_EW) := case
+            traffic_light_EW = RED & traffic_light_NS = RED & button_EW = RESET: GREEN;
+            traffic_light_EW = RED: RED;
+            traffic_light_EW = GREEN & traffic_light_NS = RED & button_EW = SET: {GREEN,YELLOW};
+            traffic_light_EW = GREEN: GREEN;
+            traffic_light_EW = YELLOW: {YELLOW, RED};
+            TRUE: {RED};
+        esac;
+
+        next(ped_light_NS) := case
+            ped_light_NS = WAIT & traffic_light_EW = RED: WALK;
+            ped_light_NS = WAIT: WAIT;
+            ped_light_NS = WALK: {WALK,FLASH};
+            ped_light_NS = FLASH: {FLASH,WAIT};
+            TRUE: {WAIT};
+        esac;     
+
+        next(ped_light_EW) := case
+            ped_light_EW = WAIT & traffic_light_NS = RED: WALK;
+            ped_light_EW = WAIT: WAIT;
+            ped_light_EW = WALK: {WALK,FLASH};
+            ped_light_EW = FLASH: {FLASH,WAIT};
+            TRUE: {WAIT};
+        esac;
+        
+        next(button_NS) := case
+            button_NS = SET & ped_light_NS = WALK: RESET;
+            button_NS = SET: SET;
+            button_NS = RESET & traffic_light_NS = GREEN: {RESET,SET};
+            button_NS = RESET: RESET;
+            TRUE: {RESET};
+        esac;
+
+        next(button_EW) := case
+            button_EW = SET & ped_light_EW = WALK: RESET;
+            button_EW = SET: SET;
+            button_EW = RESET & traffic_light_EW = GREEN: {RESET,SET};
+            button_EW = RESET: RESET;
+            TRUE: {RESET};
+        esac;
+
+        next(traffic_sensor_NS) := case
+            traffic_sensor_NS = EMPTY: {EMPTY,WAITING};
+            traffic_sensor_NS = WAIT & traffic_light_NS = GREEN: EMPTY;
+            traffic_sensor_NS = WAIT & traffic_light_NS = RED: WAITING;
+            TRUE: {EMPTY};
+        esac;
+
+        next(traffic_sensor_EW) := case
+            traffic_sensor_EW = EMPTY: {EMPTY,WAITING};
+            traffic_sensor_EW = WAIT & traffic_light_EW = GREEN: EMPTY;
+            traffic_sensor_EW = WAIT & traffic_light_EW = RED: WAITING;
+            TRUE: {EMPTY};
+        esac;
+
+        next(emergency_sensor_NS) := case
+            emergency_sensor_NS = FALSE: {TRUE,FALSE};
+            emergency_sensor_NS = TRUE & traffic_light_NS = GREEN & traffic_sensor_NS = EMPTY & ped_light_EW = WAIT: FALSE;
+            TRUE: {TRUE};
+        esac;
+
+        next(emergency_sensor_EW) := case
+            emergency_sensor_EW = FALSE: {TRUE,FALSE};
+            emergency_sensor_EW = TRUE & traffic_light_EW = GREEN & traffic_sensor_EW = EMPTY & ped_light_NS = WAIT: FALSE;
+            TRUE: {TRUE};
+        esac;
+
 
