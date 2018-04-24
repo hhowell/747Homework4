@@ -1,7 +1,6 @@
 1. Formulate at least 5 different structural testing goals (e.g., reaching a particular state,
 exercising a specific transition, reaching the same state twice, etc.). (10 Points)
-    1. Pedestrian lights are always flashing when their respective lights are yellow, 
-       and are always waiting when their respective lights are red
+    1. 
     2. NS_Light will not turn green if it is red and EW_Light hasn't been green since the previous time that NS_Light was green
     3. All variables will enter each of their states at least once
     4.
