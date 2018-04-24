@@ -2,11 +2,17 @@
 exercising a specific transition, reaching the same state twice, etc.). (10 Points)
     1. Pedestrian lights are always flashing when their respective lights are yellow, 
        and are always waiting when their respective lights are red
-    2. LightA will not turn green if it is red and LightB hasn't been green since the previous time that LightA was green
+    2. NS_Light will not turn green if it is red and EW_Light hasn't been green since the previous time that NS_Light was green
     3. All variables will enter each of their states at least once
     4.
     5.
 2. Show the trap properties that you derived for each of the test goals. (10 Points)
+    1.
+    2. SPEC ! (traffic_light_NS = RED -> F (traffic_light_EW = GREEN))
+        Not too sure about the syntax of this
+    3.
+    4.
+    5.
 
 3. Check those properties using NuSMV on your traffic lights FSM and show the test cases
 you obtained from the counter-examples produced by the tool. (5 Points)
