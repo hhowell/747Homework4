@@ -117,7 +117,9 @@ MODULE main
     SPEC  ! AG  (traffic_light_NS = GREEN & ped_light_EW = WALK) -- NS lights will never be green when the EW pedestrian lights say walk
     SPEC  ! AG  (traffic_light_EW = GREEN & ped_light_NS = WALK) -- EW lights will never be green when the NS pedestrian lights say walk
 
-    SPEC  AG (button_NS = RESET -> AF button_NS = SET)
-
+    SPEC  ! AG (traffic_light_NS = YELLOW -> traffic_light_NS = GREEN)
+    SPEC  ! AG (traffic_light_EW = YELLOW -> traffic_light_EW = GREEN) --a light will never transition from yellow to green
+    SPEC  ! AG (traffic_light_NS = RED -> traffic_light_NS = YELLOW) --NS traffic light will never transition from red to yellow
+    
     
 
