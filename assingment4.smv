@@ -16,9 +16,9 @@ MODULE main
         emergency_sensor_EW: boolean;
 
     ASSIGN
-        init(traffic_light_NS) := RED;
+        init(traffic_light_NS) := GREEN;
         init(traffic_light_EW) := RED;
-        init(ped_light_NS) := WAIT;
+        init(ped_light_NS) := WALK;
         init(ped_light_EW) := WAIT;
         init(traffic_sensor_NS) := EMPTY;
         init(traffic_sensor_EW) := EMPTY;
@@ -26,79 +26,98 @@ MODULE main
         init(emergency_sensor_EW) := FALSE;
         
         next(traffic_light_NS) := case
-            traffic_light_NS = RED & traffic_light_EW = RED & button_NS = RESET: GREEN;
-            traffic_light_NS = RED: RED;
-            traffic_light_NS = GREEN & traffic_light_EW = RED & button_NS = SET: {GREEN,YELLOW};
-            traffic_light_NS = GREEN: GREEN;
-            traffic_light_NS = YELLOW: {YELLOW, RED};
+            traffic_light_NS = RED & traffic_light_EW = RED & ped_light_EW = WAIT & button_NS = RESET & emergency_sensor_EW = FALSE: GREEN; 
+            --turn green when light is red, btton is reset, and no emergency detected
+            traffic_light_NS = RED: RED; --light will stay red otherwise
+            traffic_light_NS = GREEN & traffic_light_EW = RED & button_EW = SET: {GREEN,YELLOW}; --while green, light will stay green or change to yellow when button is pressed
+            traffic_light_NS = GREEN & traffic_light_EW = RED & traffic_sensor_EW = WAITING: {GREEN,YELLOW}; --while green, light will stay green or change to yellow when traffic is detected
+            traffic_light_NS = GREEN & traffic_light_EW = RED & emergency_sensor_EW = TRUE: YELLOW; --light must change when emergency approaches in EW direction
+            traffic_light_NS = GREEN: GREEN; --otherwise light stays green
+            traffic_light_NS = YELLOW: {YELLOW, RED}; --yellow goes to either itself or red
             TRUE: {RED};
         esac;
     
         next(traffic_light_EW) := case
-            traffic_light_EW = RED & traffic_light_NS = RED & button_EW = RESET: GREEN;
-            traffic_light_EW = RED: RED;
-            traffic_light_EW = GREEN & traffic_light_NS = RED & button_EW = SET: {GREEN,YELLOW};
-            traffic_light_EW = GREEN: GREEN;
-            traffic_light_EW = YELLOW: {YELLOW, RED};
+            traffic_light_EW = RED & traffic_light_NS = RED & ped_light_EW = WAIT & button_EW = RESET & emergency_sensor_NS = FALSE: GREEN; 
+            --turn green when light is red, btton is reset, and no emergency detected
+            traffic_light_EW = RED: RED; --light will stay red otherwise
+            traffic_light_EW = GREEN & traffic_light_NS = RED & button_EW = SET: {GREEN,YELLOW}; --while green, light will stay green or change to yellow when button is pressed
+            traffic_light_EW = GREEN & traffic_light_NS = RED & traffic_sensor_EW = WAITING: {GREEN,YELLOW}; --while green, light will stay green or change to yellow when traffic is detected
+            traffic_light_EW = GREEN & traffic_light_NS = RED & emergency_sensor_EW = TRUE: YELLOW;  --light must change when emergency approaches in NS direction
+            traffic_light_EW = GREEN: GREEN; --otherwise light stays green
+            traffic_light_EW = YELLOW: {YELLOW, RED}; --yellow goes to either itself or red
             TRUE: {RED};
         esac;
 
         next(ped_light_NS) := case
-            ped_light_NS = WAIT & traffic_light_EW = RED: WALK;
-            ped_light_NS = WAIT: WAIT;
-            ped_light_NS = WALK: {WALK,FLASH};
-            ped_light_NS = FLASH: {FLASH,WAIT};
+            ped_light_NS = WAIT & traffic_light_EW = RED: WALK; --set light to walk if currently waiting and EW traffic light is red
+            ped_light_NS = WAIT: WAIT; --otherwise, keep waiting
+            ped_light_NS = WALK & traffic_sensor_EW = WAITING: {WALK,FLASH}; --set light to flash if traffic sensor detects waiting
+            ped_light_NS = WALK & emergency_sensor_EW = TRUE: FLASH; --set light to flash if emergency sensor is true
+            ped_light_NS = WALK: {WALK,FLASH}; --otherwise keep state or flash
+            ped_light_NS = FLASH: {FLASH,WAIT}; --contintue flashing or move to wait
             TRUE: {WAIT};
         esac;     
 
         next(ped_light_EW) := case
-            ped_light_EW = WAIT & traffic_light_NS = RED: WALK;
-            ped_light_EW = WAIT: WAIT;
-            ped_light_EW = WALK: {WALK,FLASH};
-            ped_light_EW = FLASH: {FLASH,WAIT};
+            ped_light_EW = WAIT & traffic_light_NS = RED: WALK; --set light to walk if currently waiting and NS traffic light is red
+            ped_light_EW = WAIT: WAIT; --otherwise, keep waiting
+            ped_light_EW = WALK & emergency_sensor_NS = TRUE: FLASH;  --set light to flash if emergency sensor is true
+            ped_light_EW = WALK & traffic_sensor_NS = WAITING: {WALK,FLASH}; --set light to flash if traffic sensor detects waiting
+            ped_light_EW = WALK: {WALK,FLASH}; --otherwise keep state or flash
+            ped_light_EW = FLASH: {FLASH,WAIT}; --continue flashing or move to wait
             TRUE: {WAIT};
         esac;
         
         next(button_NS) := case
-            button_NS = SET & ped_light_NS = WALK: RESET;
-            button_NS = SET: SET;
-            button_NS = RESET & traffic_light_NS = GREEN: {RESET,SET};
-            button_NS = RESET: RESET;
+            button_NS = SET & ped_light_NS = WALK: RESET; --shift to reset if button set and walk
+            button_NS = SET: SET; --stay set while set
+            button_NS = RESET & traffic_light_NS = GREEN: {RESET,SET}; --while reset and light is green shift to either reset or set
+            button_NS = RESET: RESET; -- otherwise, stay reset
             TRUE: {RESET};
         esac;
 
         next(button_EW) := case
-            button_EW = SET & ped_light_EW = WALK: RESET;
-            button_EW = SET: SET;
-            button_EW = RESET & traffic_light_EW = GREEN: {RESET,SET};
-            button_EW = RESET: RESET;
+            button_EW = SET & ped_light_EW = WALK: RESET; --shift to reset if button set and walk
+            button_EW = SET: SET; --stay set while set
+            button_EW = RESET & traffic_light_EW = GREEN: {RESET,SET}; --while reset and light is green shift to either reset or set
+            button_EW = RESET: RESET; --otherwise stay in reset state
             TRUE: {RESET};
         esac;
 
         next(traffic_sensor_NS) := case
-            traffic_sensor_NS = EMPTY: {EMPTY,WAITING};
-            traffic_sensor_NS = WAIT & traffic_light_NS = GREEN: EMPTY;
-            traffic_sensor_NS = WAIT & traffic_light_NS = RED: WAITING;
+            traffic_sensor_NS = EMPTY: {EMPTY,WAITING}; --continue to be empty until waiting
+            traffic_sensor_NS = WAITING & traffic_light_NS = GREEN: EMPTY; --once light is green, reset to empty
+            traffic_sensor_NS = WAITING & traffic_light_NS = YELLOW: WAITING; --continue waiting while light is yellow
+            traffic_sensor_NS = WAITING & traffic_light_NS = RED: WAITING; --contintue waiting while light is red
             TRUE: {EMPTY};
         esac;
 
         next(traffic_sensor_EW) := case
-            traffic_sensor_EW = EMPTY: {EMPTY,WAITING};
-            traffic_sensor_EW = WAIT & traffic_light_EW = GREEN: EMPTY;
-            traffic_sensor_EW = WAIT & traffic_light_EW = RED: WAITING;
-            TRUE: {EMPTY};
-        esac;
+            traffic_sensor_EW = EMPTY: {EMPTY,WAITING}; --continue to be empty until waiting
+            traffic_sensor_EW = WAITING & traffic_light_EW = GREEN: EMPTY; --once light is green, reset to empty
+            traffic_sensor_EW = WAITING & traffic_light_EW = YELLOW: WAITING; --continue waiting while light is yellow
+            traffic_sensor_EW = WAITING & traffic_light_EW = RED: WAITING; --continue waiting while light is red
+            TRUE: {EMPTY}; 
+        esac; 
 
         next(emergency_sensor_NS) := case
-            emergency_sensor_NS = FALSE: {TRUE,FALSE};
-            emergency_sensor_NS = TRUE & traffic_light_NS = GREEN & traffic_sensor_NS = EMPTY & ped_light_EW = WAIT: FALSE;
-            TRUE: {TRUE};
+            emergency_sensor_NS = FALSE: {TRUE,FALSE}; --sensor waits for TRUE
+            emergency_sensor_NS = TRUE & traffic_light_NS = GREEN & traffic_sensor_NS = EMPTY & ped_light_EW = WAIT: FALSE; --once light is green and no traffic sensed and cross walk if false set to false
+            TRUE: {FALSE};
         esac;
 
         next(emergency_sensor_EW) := case
-            emergency_sensor_EW = FALSE: {TRUE,FALSE};
-            emergency_sensor_EW = TRUE & traffic_light_EW = GREEN & traffic_sensor_EW = EMPTY & ped_light_NS = WAIT: FALSE;
-            TRUE: {TRUE};
+            emergency_sensor_EW = FALSE: {TRUE,FALSE}; --sensor waits for TRUE
+            emergency_sensor_EW = TRUE & traffic_light_EW = GREEN & traffic_sensor_EW = EMPTY & ped_light_NS = WAIT: FALSE; --once light is green and no traffic sensed and cross walk if false set to false
+            TRUE: {FALSE};
         esac;
 
+    SPEC  ! AG  (traffic_light_NS = GREEN & traffic_light_EW = GREEN) -- both lights will never be green
+    SPEC  ! AG  (traffic_light_NS = GREEN & ped_light_EW = WALK) -- NS lights will never be green when the EW pedestrian lights say walk
+    SPEC  ! AG  (traffic_light_EW = GREEN & ped_light_NS = WALK) -- EW lights will never be green when the NS pedestrian lights say walk
+
+    SPEC  AG (button_NS = RESET -> AF button_NS = SET)
+
+    
 
