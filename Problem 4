@@ -1,0 +1,11 @@
+1. Formulate at least 5 different structural testing goals (e.g., reaching a particular state,
+exercising a specific transition, reaching the same state twice, etc.). (10 Points)
+
+2. Show the trap properties that you derived for each of the test goals. (10 Points)
+
+3. Check those properties using NuSMV on your traffic lights FSM and show the test cases
+you obtained from the counter-examples produced by the tool. (5 Points)
+
+
+You must submit your trap properties and the NuSMV output file which contains your test cases.
+You only need to redirect NuSMV output to a file and submit it, do not edit the output file.
