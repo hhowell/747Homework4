@@ -1,0 +1,18 @@
+SPEC AG (traffic_light_NS = GREEN & traffic_light_EW = GREEN); --anti-property
+
+Tracece Description: CTL Counterexample 
+Trace Type: Counterexample 
+  -> State: 1.1 <-
+    traffic_light_NS = GREEN
+    traffic_light_EW = RED
+    ped_light_NS = WALK
+    ped_light_EW = WAIT
+    button_NS = RESET
+    button_EW = RESET
+    traffic_sensor_NS = EMPTY
+    traffic_sensor_EW = EMPTY
+    emergency_sensor_NS = FALSE
+    emergency_sensor_EW = FALSE
+
+Our counter example is to show that it is not possible in all executions to have both traffic lights green
+The simpliest counter example is the initial set of staes where both lights are not green

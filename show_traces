@@ -1,0 +1,146 @@
+MV > go   
+NuSMV > pick_state -i
+
+***************  AVAILABLE STATES  *************
+  
+  ================= State =================
+  0) -------------------------
+  traffic_light_NS = GREEN
+  traffic_light_EW = RED
+  ped_light_NS = WALK
+  ped_light_EW = WAIT
+  button_NS = SET
+  button_EW = SET
+  traffic_sensor_NS = EMPTY
+  traffic_sensor_EW = EMPTY
+  emergency_sensor_NS = FALSE
+  emergency_sensor_EW = FALSE
+  
+  
+  ================= State =================
+  1) -------------------------
+  button_NS = RESET
+  
+  
+  ================= State =================
+  2) -------------------------
+  button_NS = SET
+  button_EW = RESET
+  
+  
+  ================= State =================
+  3) -------------------------
+  button_NS = RESET
+  
+
+Choose a state from the above (0-3): 0
+
+Chosen state is: 0
+NuSMV > simulate -r -k 3
+********  Simulation Starting From State 1.1   ********
+NuSMV > simulate -r -k 5
+********  Simulation Starting From State 1.4   ********
+NuSMV > show_traces -v
+    <!-- ################### Trace number: 1 ################### -->
+Trace Description: Simulation Trace 
+Trace Type: Simulation 
+  -> State: 1.1 <-
+    traffic_light_NS = GREEN
+    traffic_light_EW = RED
+    ped_light_NS = WALK
+    ped_light_EW = WAIT
+    button_NS = SET
+    button_EW = SET
+    traffic_sensor_NS = EMPTY
+    traffic_sensor_EW = EMPTY
+    emergency_sensor_NS = FALSE
+    emergency_sensor_EW = FALSE
+  -> State: 1.2 <-
+    traffic_light_NS = YELLOW
+    traffic_light_EW = RED
+    ped_light_NS = WALK
+    ped_light_EW = WAIT
+    button_NS = RESET
+    button_EW = SET
+    traffic_sensor_NS = EMPTY
+    traffic_sensor_EW = WAITING
+    emergency_sensor_NS = FALSE
+    emergency_sensor_EW = FALSE
+  -> State: 1.3 <-
+    traffic_light_NS = RED
+    traffic_light_EW = RED
+    ped_light_NS = WALK
+    ped_light_EW = WAIT
+    button_NS = RESET
+    button_EW = SET
+    traffic_sensor_NS = EMPTY
+    traffic_sensor_EW = WAITING
+    emergency_sensor_NS = FALSE
+    emergency_sensor_EW = FALSE
+  -> State: 1.4 <-
+    traffic_light_NS = GREEN
+    traffic_light_EW = RED
+    ped_light_NS = WALK
+    ped_light_EW = WALK
+    button_NS = RESET
+    button_EW = SET
+    traffic_sensor_NS = EMPTY
+    traffic_sensor_EW = WAITING
+    emergency_sensor_NS = TRUE
+    emergency_sensor_EW = FALSE
+  -> State: 1.5 <-
+    traffic_light_NS = YELLOW
+    traffic_light_EW = RED
+    ped_light_NS = FLASH
+    ped_light_EW = FLASH
+    button_NS = SET
+    button_EW = RESET
+    traffic_sensor_NS = EMPTY
+    traffic_sensor_EW = WAITING
+    emergency_sensor_NS = FALSE
+    emergency_sensor_EW = FALSE
+  -> State: 1.6 <-
+    traffic_light_NS = RED
+    traffic_light_EW = RED
+    ped_light_NS = WAIT
+    ped_light_EW = WAIT
+    button_NS = SET
+    button_EW = RESET
+    traffic_sensor_NS = EMPTY
+    traffic_sensor_EW = WAITING
+    emergency_sensor_NS = FALSE
+    emergency_sensor_EW = FALSE
+  -> State: 1.7 <-
+    traffic_light_NS = RED
+    traffic_light_EW = GREEN
+    ped_light_NS = WALK
+    ped_light_EW = WALK
+    button_NS = SET
+    button_EW = RESET
+    traffic_sensor_NS = EMPTY
+    traffic_sensor_EW = WAITING
+    emergency_sensor_NS = FALSE
+    emergency_sensor_EW = FALSE
+  -> State: 1.8 <-
+    traffic_light_NS = RED
+    traffic_light_EW = YELLOW
+    ped_light_NS = FLASH
+    ped_light_EW = FLASH
+    button_NS = RESET
+    button_EW = SET
+    traffic_sensor_NS = EMPTY
+    traffic_sensor_EW = EMPTY
+    emergency_sensor_NS = TRUE
+    emergency_sensor_EW = TRUE
+  -> State: 1.9 <-
+    traffic_light_NS = RED
+    traffic_light_EW = YELLOW
+    ped_light_NS = FLASH
+    ped_light_EW = WAIT
+    button_NS = RESET
+    button_EW = SET
+    traffic_sensor_NS = WAITING
+    traffic_sensor_EW = WAITING
+    emergency_sensor_NS = FALSE
+    emergency_sensor_EW = FALSE
+
