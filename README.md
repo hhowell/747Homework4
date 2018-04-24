@@ -4,7 +4,7 @@ The model will assume that traffic lights in north/south and east/west direction
 ped_light_NS is the crosswalk going north or south on either side
 ped_light_EW is the crosswalk going east or west on either side
 
-Assume that cars will yeild to pedestrians when turning left or right
+Assume that cars will yield to pedestrians when turning left or right
 
 How to run model
 $ NuSMV -int assignment4.smv
