@@ -52,7 +52,7 @@ MODULE main
         next(ped_light_NS) := case
             ped_light_NS = WAIT & traffic_light_EW = RED: WALK; --set light to walk if currently waiting and EW traffic light is red
             ped_light_NS = WAIT: WAIT; --otherwise, keep waiting
-            ped_light_NS = WALK & traffic_sensor_EW = WAITING: {WALK,FLASH}; --set light to flash if traffic sensor detects waiting
+            ped_light_NS = WALK & traffic_sensor_EW = WAITING: FLASH; --set light to flash if traffic sensor detects waiting
             ped_light_NS = WALK & emergency_sensor_EW = TRUE: FLASH; --set light to flash if emergency sensor is true
             ped_light_NS = WALK: {WALK,FLASH}; --otherwise keep state or flash
             ped_light_NS = FLASH: {FLASH,WAIT}; --contintue flashing or move to wait
@@ -120,6 +120,10 @@ MODULE main
     SPEC  ! AG (traffic_light_NS = YELLOW -> traffic_light_NS = GREEN)
     SPEC  ! AG (traffic_light_EW = YELLOW -> traffic_light_EW = GREEN) --a light will never transition from yellow to green
     SPEC  ! AG (traffic_light_NS = RED -> traffic_light_NS = YELLOW) --NS traffic light will never transition from red to yellow
+	SPEC  ! AG (traffic_light_EW = RED -> traffic_light_EW = YELLOW) --EW traffic light will never transition from red to yellow 
+	
+	SPEC  ! AG (emergency_sensor_EW = TRUE & traffic_light_NS = GREEN) --EW emergency vehicles will never conflict with NS traffic 
+	SPEC  ! AG (emergency_sensor_NS = TRUE & traffic_light_EW = GREEN) --NS emergency vehicles will never conflict with EW traffic 
     
     
 
