@@ -1,21 +1,20 @@
 1. Formulate at least 5 different structural testing goals (e.g., reaching a particular state,
 exercising a specific transition, reaching the same state twice, etc.). (10 Points)
-    1. 
-    2. NS_Light will not turn green if it is red and EW_Light hasn't been green since the previous time that NS_Light was green
-    3. All variables will enter each of their states at least once
-    4.
-    5.
+    1. Reach a state in which traffic_light_NS and traffic_light_EW are red and the same time. 
+    2. Reach the transition between traffic_light_EW being YELLOW and traffic_light_EW being RED.
+    3. Show that if the traffic_light_NS is green and the traffic_light_EW is RED, we must eventually reach a state in which the traffic_light_NS is red and the traffic_light_EW is green.
+    4. Reach the transition between ped_light_NS being WAIT and WALK.
+    5. Show the emergency_sensor_NS being disabled.
 2. Show the trap properties that you derived for each of the test goals. (10 Points)
-    1.
-    2. SPEC ! (traffic_light_NS = RED -> F (traffic_light_EW = GREEN))
-        Not too sure about the syntax of this
-    3.
-    4.
-    5.
+    1. SPEC AG ! (traffic_light_NS = RED & traffic_light_EW = RED)
+    2. SPEC AG ! (traffic_light_EW = YELLOW & EF traffic_light_EW = RED)
+    3. SPEC AG ! ((traffic_light_NS = GREEN & traffic_light_EW = RED) -> EF (traffic_light_NS = RED & traffic_light_EW = GREEN))
+    4. SPEC AG ! (ped_light_NS = WAIT & EF ped_light_NS = WALK)
+    5. SPEC AG ! (emergency_sensor_NS = TRUE & EF emergency_sensor_NS= FALSE)
 
 3. Check those properties using NuSMV on your traffic lights FSM and show the test cases
 you obtained from the counter-examples produced by the tool. (5 Points)
-
+    See file `trap_traces`
 
 You must submit your trap properties and the NuSMV output file which contains your test cases.
 You only need to redirect NuSMV output to a file and submit it, do not edit the output file.
